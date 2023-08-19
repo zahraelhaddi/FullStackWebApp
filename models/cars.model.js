@@ -228,3 +228,21 @@ exports.verifCarAvailability = (id) => {
     })
 
 }
+
+exports.changeAvailability = (id, availability) => {
+    return new Promise(async (resolve, reject) => {
+        const queryverif = `select car_id from cars where car_id=$1;`
+        const verif = await client.query(queryverif, [id])
+        if (verif.rows.length > 0) {
+            const query = "update cars set availability_status=$1 where car_id=$2;"
+            client.query(query, [availability, id]).then((doc) => {
+                resolve(doc)
+            }).catch((err) => {
+                reject(err)
+            })
+        } else {
+            reject('No car with the specified id!')
+        }
+
+    })
+}

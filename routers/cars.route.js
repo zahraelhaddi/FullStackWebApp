@@ -83,6 +83,12 @@ route.patch('/cars/tax/:id', async (req, res, next) => {
 
 })
 
-
+route.patch('/availability/:id', (req, res, next) => {
+    carsModel.changeAvailability(req.params.id, req.body.availability).then((doc) => {
+        res.json({ availability: 'Availability updated successfully!' })
+    }).catch((err) => {
+        res.json(err)
+    })
+})
 
 module.exports = route
