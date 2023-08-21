@@ -101,7 +101,7 @@ exports.deleteOneUser=(id)=>{
         client.query(`SELECT * from users where user_id=$1;`,[id]).then((result)=>{
             if(result.rows.length===1){
                 const deleteOneUserQuery= `DELETE from users where user_id=$1;`;
-                resolve(result)
+                resolve(result.rows)
                 client.query(deleteOneUserQuery,[id])
                 
             }else{

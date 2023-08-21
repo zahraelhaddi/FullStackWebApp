@@ -61,24 +61,17 @@ exports.getAllTransfers = () => {
 
 exports.addTransfer = (car_id, source, destination, user_id) => {
     return new Promise((resolve, reject) => {
-        const verifQuery = `select * from transfers where car_id=$1;`
-        client.query(verifQuery, [car_id]).then((result) => {
-            if (result.rows.length > 0) {
-                reject('transfer already done')
-            } else {
-                const query = `insert into transfers(car_id,source_agency_id,destination_agency_id,user_id) values($1,$2,$3,$4) ;`
-                client.query(query, [car_id, source, destination, user_id]).then((result) => {
-                    resolve(result)
-                }).catch((err) => {
-                    reject(err)
-                })
-            }
+        const query = `insert into transfers(car_id,source_agency_id,destination_agency_id,user_id) values($1,$2,$3,$4) ;`
+        client.query(query, [car_id, source, destination, user_id]).then((result) => {
+            resolve(result)
         }).catch((err) => {
             reject(err)
         })
+    }).catch((err) => {
+        reject(err)
     })
-
 }
+
 
 exports.getTransferById = (id) => {
     return new Promise((resolve, reject) => {
@@ -132,3 +125,14 @@ exports.updateTransfer = (id, car_id, source, destination,) => {
     })
 }
 
+
+exports.getUserTransfers = (id) => {
+    return new Promise((resolve, reject) => {
+        const query = `select *from transfers where user_id=$1; `
+        client.query(query, [id]).then((doc) => {
+            resolve(doc.rows)
+        }).catch((err) => {
+            reject(err)
+        })
+    })
+}

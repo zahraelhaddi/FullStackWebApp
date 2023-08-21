@@ -34,11 +34,11 @@ exports.addAgency = (name, location) => {
         const verifQuery = `SELECT * FROM agencies WHERE agency_name=$1 OR agency_location=$2;`;
         client.query(verifQuery, [name, location]).then((result) => {
             if (result.rows.length > 0) {
-                reject("agency already exists")
+                reject("Agency already exists")
             } else {
                 const query = `INSERT INTO agencies(agency_name,agency_location) VALUES($1,$2);`;
                 client.query(query, [name, location]).then((msg) => {
-                    resolve('successfully added agency')
+                    resolve('Agency successfully added!')
                 }).catch((err) => {
                     reject(err)
                 })
@@ -56,9 +56,9 @@ exports.getAgencyById = (id) => {
         const query = `select * from agencies where agency_id=$1;`
         client.query(query, [id]).then((result) => {
             if (result.rows.length > 0) {
-                resolve(result)
+                resolve(result.rows)
             } else {
-                reject('no agency with this id')
+                reject('No Agency with the Specified id')
             }
         })
     })

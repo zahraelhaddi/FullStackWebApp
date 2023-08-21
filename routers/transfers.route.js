@@ -34,25 +34,32 @@ route.get('/transfers', (req, res, next) => {
 // })
 
 route.post('/transfers', (req, res, next) => {
-
-    carsModel.verifCarAvailability(req.body.car_id).then((doc) => {
-        if (doc.rows[0].availability_status === true) {
-            transfersModel.addTransfer(req.body.car_id, req.body.source, req.body.destination, req.body.user_id).then((doc) => {
-                carsModel.updateCarAfterTransfer(req.body.car_id, false, req.body.destination).then((result) => {
-                    res.json({ carUpdatedAfterTransfer: result })
+    carsModel.verifCarExist(req.body.car_id).then((doc) => {
+        carsModel.verifCarAvailability(req.body.car_id).then((doc) => {
+            if (doc.rows[0].availability_status === true) {
+                transfersModel.addTransfer(req.body.car_id, req.body.source, req.body.destination, req.body.user_id).then((doc) => {
+                    carsModel.updateCarAfterTransfer(req.body.car_id, false, req.body.destination).then((result) => {
+                        res.json({ carUpdatedAfterTransfer: result })
+                    }).catch((err) => {
+                        res.json({ error: err })
+                    })
+                    res.json({ transferAdded: doc })
                 }).catch((err) => {
                     res.json({ error: err })
                 })
-                res.json({ transferAdded: doc })
-            }).catch((err) => {
-                res.json({ error: err })
-            })
-        } else {
-            res.json({ msg: 'car not available for transfer, it is already transfered!!' })
-        }
+            } else {
+                res.json({ msg: 'car not available for transfer, it is already transfered!!' })
+            }
+        }).catch((err) => {
+            res.json({ errorr: err })
+        })
     }).catch((err) => {
-        res.json({ errorr: err })
+        res.json({ error: err })
     })
+
+
+
+
 
 })
 
@@ -85,6 +92,13 @@ route.patch('/transfers/:id', (req, res, next) => {
     })
 })
 
+route.get('/transfers/user/:id', (req, res, next) => {
+    transfersModel.getUserTransfers(req.params.id).then((result) => {
+        res.json({ userTransfers: result })
+    }).catch((err) => {
+        res.json({ error: err })
+    })
+})
 
 
 

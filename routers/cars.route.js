@@ -20,7 +20,7 @@ verifyToken = async (req, res, next) => {
     }
 }
 
-// get cars endpoints
+// get all cars endpoints
 route.get('/cars', (req, res, next) => {
     carsModel.getAllcars().then((doc) => {
         res.json({ cars: doc })
@@ -69,7 +69,7 @@ route.patch('/cars/:id', verifyToken, (req, res, next) => {
 })
 
 
-//update cars tax
+//update a car's tax(if null)
 route.patch('/cars/tax/:id', async (req, res, next) => {
     const doc = await carsModel.getCarburantAndPuissance(req.params.id)
     let carburant_id = doc.rows[0].carburant_id
@@ -83,11 +83,12 @@ route.patch('/cars/tax/:id', async (req, res, next) => {
 
 })
 
+//update a car's avalability_status
 route.patch('/availability/:id', (req, res, next) => {
     carsModel.changeAvailability(req.params.id, req.body.availability).then((doc) => {
         res.json({ availability: 'Availability updated successfully!' })
     }).catch((err) => {
-        res.json(err)
+        res.json({ error: err })
     })
 })
 

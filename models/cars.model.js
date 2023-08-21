@@ -87,19 +87,20 @@ exports.getcarById = (id) => {
         marque,
         color,
         categorie,
-        carburant_id,
+        c.carburant_id,
         date_immatri,
         puissance,
         JSON_BUILD_OBJECT('carburant_code', carb.carburant_code, 'carburant_name', carb.carburant_name) AS carburant_info,
         JSON_BUILD_OBJECT('agency_name', a.agency_name, 'agency_location', a.agency_location) AS agency_info
     FROM cars c
     JOIN agencies a ON c.agency_id = a.agency_id
-    JOIN carburants carb ON c.carburant_id = carb.id and car_id=$1;`
+    JOIN carburants carb ON c.carburant_id = carb.carburant_id 
+    WHERE car_id=$1;`
         client.query(query, [id]).then((result) => {
             if (result.rows.length > 0) {
                 resolve(result.rows)
             } else {
-                reject('no data to show')
+                reject('no car with the specified id!')
             }
         }).catch((err) => {
             reject(err)
@@ -115,7 +116,7 @@ exports.deleteOneCar = (id) => {
                 const deleteOnecarQuery = `DELETE from cars where car_id=$1;`;
                 //resolve(result)
                 client.query(deleteOnecarQuery, [id]).then((result) => {
-                    resolve(result)
+                    resolve('Car deleted successfully!')
                 }).catch((err) => {
                     reject(err)
                 })
@@ -212,6 +213,20 @@ exports.updateCarAfterTransfer = (car_id, new_availability_status, new_source_ag
     })
 }
 
+exports.verifCarExist = (id) => {
+    return new Promise((resolve, reject) => {
+        const query = `select * from cars where car_id=$1;`
+        client.query(query, [id]).then((doc) => {
+            if (doc.rows.length > 0) {
+                resolve(doc)
+            } else {
+                reject('car does not exist')
+            }
+        }).catch((err) => {
+            reject(err)
+        })
+    })
+}
 
 exports.verifCarAvailability = (id) => {
     return new Promise((resolve, reject) => {

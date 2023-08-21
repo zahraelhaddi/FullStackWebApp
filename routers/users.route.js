@@ -46,7 +46,7 @@ route.get('/users', verifyToken, (req, res, next) => {
 
 route.get('/users/:id', verifyToken, (req, res, next) => {
     usersModel.getOneUser(req.params.id).then((doc) => {
-        res.json({ user: doc })
+        res.json({ user: doc.rows })
     }).catch((err) => {
         res.json({ error: err })
     })

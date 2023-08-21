@@ -18,7 +18,7 @@ verifyToken = async (req, res, next) => {
     }
 }
 
-// add ahgggjl
+// add agency
 route.post('/agencies', verifyToken, (req, res, next) => {
     agenciesModel.addAgency(req.body.name, req.body.location).then((msg) => {
         res.json({ msg: msg })
@@ -27,7 +27,7 @@ route.post('/agencies', verifyToken, (req, res, next) => {
     })
 })
 
-// jfjkn
+// get all agencies
 route.get('/agencies', (req, res, next) => {
     agenciesModel.getAllagencies().then((doc) => {
         res.json({ agencies: doc })
@@ -36,6 +36,7 @@ route.get('/agencies', (req, res, next) => {
     })
 })
 
+//get agency by id
 route.get('/agencies/:id', (req, res, next) => {
     agenciesModel.getAgencyById(req.params.id).then((doc) => {
         res.json({ agencyFound: doc })
@@ -44,14 +45,16 @@ route.get('/agencies/:id', (req, res, next) => {
     })
 })
 
+//DELETE agency by id
 route.delete('/agencies/:id', verifyToken, (req, res, next) => {
     agenciesModel.deleteOneAgency(req.params.id).then((doc) => {
-        res.json({ agencyDeleted: doc })
+        res.json({ agencyDeleted: doc.rows })
     }).catch((err) => {
         res.json({ error: err })
     })
 })
 
+//UPDATE agency by id
 route.patch('/agencies/:id', verifyToken, (req, res, next) => {
     agenciesModel.updateAgency(req.params.id, req.body.name, req.body.location).then((doc) => {
         res.json({ agencyupdated: doc })
