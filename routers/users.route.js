@@ -9,62 +9,62 @@ const secretKey = process.env.SECRET_KEY
 verifyToken = async (req, res, next) => {
     let token = req.headers.token
     if (!token) {
-        res.status(404).json({ msg: "access denied!" })
+        res.status(404).send("access denied!")
     }
     try {
         let verif = await jwt.verify(token, secretKey)  //jwt.verify katakhd token dyalna okatchof wach howa fl7a9i9a kayn 
         next()
     } catch (err) {
-        res.status(404).json({ msg: err })
+        res.status(404).send(err)
     }
 }
 
 
 route.post('/register', (req, res, next) => {
     usersModel.register(req.body.fullname, req.body.email, req.body.agency, req.body.password).then((msg) => {
-        res.json({ message: msg })
+        res.send(msg)
     }).catch((err) => {
-        res.json({ error: err })
+        res.send(err)
     })
 })
 
 route.post('/login', (req, res, next) => {
     usersModel.login(req.body.email, req.body.password).then((doc) => {
-        res.json({ token: doc })
+        res.send(doc)
     }).catch((err) => {
-        res.json({ error: err })
+        res.send(err)
     })
 })
 
-route.get('/users', verifyToken, (req, res, next) => {
+route.get('/users', (req, res, next) => {
     usersModel.getAllUsers().then((users) => {
-        res.json({ users: users })
+        res.send(users)
     }).catch((err) => {
-        res.json({ error: err })
+        res.send(err)
     })
 })
 
 route.get('/users/:id', verifyToken, (req, res, next) => {
     usersModel.getOneUser(req.params.id).then((doc) => {
-        res.json({ user: doc.rows })
+        res.send(doc.rows)
     }).catch((err) => {
-        res.json({ error: err })
+        res.send(err)
     })
 })
 
 route.delete('/users/:id', verifyToken, (req, res, next) => {
     usersModel.deleteOneUser(req.params.id).then((doc) => {
-        res.json({ deleted: doc })
+        res.send(doc)
     }).catch((err) => {
-        res.json({ error: err })
+        res.send(err)
     })
 })
 
 route.patch('/users/:id', verifyToken, (req, res, next) => {
     usersModel.updateUser(req.params.id, req.body.fullname, req.body.email, req.body.agency, req.body.password).then((doc) => {
-        res.json({ updatedUser: doc })
+        res.send(doc)
     }).catch((err) => {
-        res.json({ error: err })
+        res.send(err)
     })
 })
 

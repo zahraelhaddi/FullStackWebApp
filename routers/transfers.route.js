@@ -5,9 +5,9 @@ const carsModel = require('../models/cars.model')
 
 route.get('/transfers', (req, res, next) => {
     transfersModel.getAllTransfers().then((doc) => {
-        res.json({ transfers: doc })
+        res.send(doc)
     }).catch((err) => {
-        res.json({ error: err })
+        res.send(err)
     })
 })
 
@@ -16,19 +16,19 @@ route.get('/transfers', (req, res, next) => {
 //         if (doc.rows[0].availability_status === true) {
 //             transfersModel.addTransfer(req.body.car_id, req.body.source, req.body.destination, req.body.user_id).then((doc) => {
 //                 carsModel.updateCarAfterTransfer(req.body.car_id, req.body.source, req.body.destination).then((result) => {
-//                     res.json({ carUpdatedAfterTransfer: result })
+//                     res.send({ carUpdatedAfterTransfer: result })
 //                 }).catch((err) => {
-//                     res.json({ error: err })
+//                     res.send(err)
 //                 })
-//                 res.json({ transferAdded: doc })
+//                 res.send({ transferAdded: doc })
 //             }).catch((err) => {
-//                 res.json({ error: err })
+//                 res.send(err)
 //             })
 //         } else {
-//             res.json({ msg: 'car not available for transfer, it is already transfered!!' })
+//             res.send({ msg: 'car not available for transfer, it is already transfered!!' })
 //         }
 //     }).catch((err) => {
-//         res.json({ errorr: err })
+//         res.send({ errorr: err })
 //     })
 
 // })
@@ -39,22 +39,22 @@ route.post('/transfers', (req, res, next) => {
             if (doc.rows[0].availability_status === true) {
                 transfersModel.addTransfer(req.body.car_id, req.body.source, req.body.destination, req.body.user_id).then((doc) => {
                     carsModel.updateCarAfterTransfer(req.body.car_id, false, req.body.destination).then((result) => {
-                        res.json({ carUpdatedAfterTransfer: result })
+                        res.send(result)
                     }).catch((err) => {
-                        res.json({ error: err })
+                        res.send(err)
                     })
-                    res.json({ transferAdded: doc })
+                    res.send(doc)
                 }).catch((err) => {
-                    res.json({ error: err })
+                    res.send(err)
                 })
             } else {
-                res.json({ msg: 'car not available for transfer, it is already transfered!!' })
+                res.send('car not available for transfer, it is already transfered!!')
             }
         }).catch((err) => {
-            res.json({ errorr: err })
+            res.send(err)
         })
     }).catch((err) => {
-        res.json({ error: err })
+        res.send(err)
     })
 
 
@@ -65,38 +65,39 @@ route.post('/transfers', (req, res, next) => {
 
 route.get('/transfers/:id', (req, res, next) => {
     transfersModel.getTransferById(req.params.id).then((doc) => {
-        res.json({ transfer: doc })
+        res.send(doc)
     }).catch((err) => {
-        res.json({ error: err })
+        res.send(err)
     })
 })
 
 route.delete('/transfers/:id', (req, res, next) => {
     transfersModel.deleteOneTransfer(req.params.id).then((doc) => {
-        res.json({ transferDeleted: doc })
+        res.send(doc)
     }).catch((err) => {
-        res.json({ error: err })
+        res.send(err)
     })
 })
 
 route.patch('/transfers/:id', (req, res, next) => {
     transfersModel.updateTransfer(req.params.id, req.body.car_id, req.body.source, req.body.destination).then((doc) => {
         carsModel.updateCarAfterTransfer(req.body.car_id, false, req.body.destination).then((result) => {
-            res.json({ carUpdatedAfterTransfer: result })
+            res.send(result)
         }).catch((err) => {
-            res.json({ error: err })
+            res.send(err)
         })
-        //res.json({ transferUpdated: doc })
+        //res.send({ transferUpdated: doc })
     }).catch((err) => {
-        res.json({ error: err })
+        res.send(err)
     })
 })
 
 route.get('/transfers/user/:id', (req, res, next) => {
     transfersModel.getUserTransfers(req.params.id).then((result) => {
-        res.json({ userTransfers: result })
+        // res.send({ userTransfers: result })
+        res.send(result)
     }).catch((err) => {
-        res.json({ error: err })
+        res.send(err)
     })
 })
 
