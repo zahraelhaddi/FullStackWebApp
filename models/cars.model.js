@@ -37,7 +37,8 @@ exports.getAllcars = () => {
         JSON_BUILD_OBJECT('agency_name', a.agency_name, 'agency_location', a.agency_location) AS agency_info
     FROM cars c
     JOIN agencies a ON c.agency_id = a.agency_id
-    JOIN carburants carb ON c.carburant_id = carb.carburant_id;`
+    JOIN carburants carb ON c.carburant_id = carb.carburant_id
+    ORDER BY car_id asc;`
 
         client.query(query).then((result) => {
             if (result.rows.length > 0) {
@@ -133,27 +134,26 @@ exports.deleteOneCar = (id) => {
 
 exports.updateCar = (id, agency, model, tax, availability, matricule, ville, marque, color, categorie, carburant_id, date_immatri, puissance) => {
     return new Promise((resolve, reject) => {
-        const verifquery = `SELECT * FROM cars WHERE car_id = $1;`;
-        client.query(verifquery, [id]).then((resu) => {
-            if (resu.rows.length > 0) {
-                const query = `
+        const query = `
                     UPDATE cars
-                    SET agency_id = $1, model = $2, annual_tax = $3, availability_status = $4, , matricule=$5, ville=$6, marque=$7, color=$8, categorie=$9, carburant_id=$10, date_immatri=$11, puissance=$12
-                    WHERE car_id = $5;
+                    SET agency_id = $1, model = $2, annual_tax = $3, availability_status = $4 , matricule=$5, ville=$6, marque=$7, color=$8, categorie=$9, carburant_id=$10, date_immatri=$11, puissance=$12
+                    WHERE car_id = $13;
                 `;
-                client.query(query, [agency, model, tax, availability, matricule, ville, marque, color, categorie, carburant_id, date_immatri, puissance, id]).then(() => {
-                    resolve('updated');
-                }).catch((err) => {
-                    reject(err);
-                });
-            } else {
-                reject('no car with the specified id');
-            }
+        client.query(query, [agency, model, tax, availability, matricule, ville, marque, color, categorie, carburant_id, date_immatri, puissance, id]).then(() => {
+            resolve('updated')
         }).catch((err) => {
-            reject(err);
-        });
-    });
+            reject(err)
+        })
+
+    })
 }
+
+
+
+
+
+
+
 
 exports.getCarburantAndPuissance = (id) => {
     return new Promise((resolve, reject) => {
@@ -245,12 +245,13 @@ exports.verifCarAvailability = (id) => {
 }
 
 exports.changeAvailability = (id, availability) => {
+
     return new Promise(async (resolve, reject) => {
         const queryverif = `select car_id from cars where car_id=$1;`
         const verif = await client.query(queryverif, [id])
         if (verif.rows.length > 0) {
             const query = "update cars set availability_status=$1 where car_id=$2;"
-            client.query(query, [availability, id]).then((doc) => {
+            client.query(query, [!availability, id]).then((doc) => {
                 resolve(doc)
             }).catch((err) => {
                 reject(err)
