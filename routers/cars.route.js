@@ -43,9 +43,9 @@ route.post('/cars', (req, res, next) => {
 //get car by id endpoint
 route.get('/cars/:id', (req, res, next) => {
     carsModel.getcarById(req.params.id).then((doc) => {
-        res.send(doc)
+        res.json(doc[0])
     }).catch((err) => {
-        res.send(err)
+        res.json({ msg: err })
     })
 })
 
