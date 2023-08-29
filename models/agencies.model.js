@@ -83,20 +83,15 @@ exports.deleteOneAgency = (id) => {
 
 exports.updateAgency = (id, name, loc) => {
     return new Promise((resolve, reject) => {
-        const verifquery = `select * from agencies where agency_id=$1;`
-        client.query(verifquery, [id]).then((resu) => {
-            if (resu.rows.length > 0) {
-                resolve(resu.rows)
-                const query = `update agencies set agency_name=$1,agency_location=$2 where agency_id=$3;`
-                client.query(query, [name, loc, id]).then((result) => {
-                    resolve('updated')
-                }).catch((err) => {
-                    reject(err)
-                })
-            } else {
-                reject('no agency with the specified id')
-            }
+        const query = `update agencies set agency_name=$1,agency_location=$2 where agency_id=$3;`
+        client.query(query, [name, loc, id]).then((result) => {
+            resolve('updated')
+        }).catch((err) => {
+            reject(err)
         })
 
     })
+
+
 }
+

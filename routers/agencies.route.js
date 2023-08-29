@@ -8,58 +8,59 @@ const secretKey = process.env.SECRET_KEY
 verifyToken = async (req, res, next) => {
     let token = req.headers.token
     if (!token) {
-        res.status(404).send("access denied!")
+        res.status(404).json("access denied!")
     }
     try {
         let verif = await jwt.verify(token, secretKey)  //jwt.verify katakhd token dyalna okatchof wach howa fl7a9i9a kayn 
         next()
     } catch (err) {
-        res.status(404).send(err)
+        res.status(404).json(err)
     }
 }
 
 // add agency
-route.post('/agencies', verifyToken, (req, res, next) => {
-    agenciesModel.addAgency(req.body.name, req.body.location).then((msg) => {
-        res.send(msg)
+route.post('/agencies', (req, res, next) => {
+    agenciesModel.addAgency(req.body.agency_name, req.body.agency_location).then((msg) => {
+        res.json({ msg: msg })
     }).catch((err) => {
-        res.send(err)
+        res.json({ error: err })
     })
 })
 
 // get all agencies
 route.get('/agencies', (req, res, next) => {
     agenciesModel.getAllagencies().then((doc) => {
-        res.send(doc)
+        res.json(doc)
     }).catch((err) => {
-        res.send(err)
+        res.json(err)
     })
 })
 
 //get agency by id
 route.get('/agencies/:id', (req, res, next) => {
     agenciesModel.getAgencyById(req.params.id).then((doc) => {
-        res.send(doc)
+        res.json(doc)
     }).catch((err) => {
-        res.send(err)
+        res.json(err)
     })
 })
 
 //DELETE agency by id
-route.delete('/agencies/:id', verifyToken, (req, res, next) => {
+route.delete('/agencies/:id', (req, res, next) => {
     agenciesModel.deleteOneAgency(req.params.id).then((doc) => {
-        res.send(doc)
+        res.json({ msg: doc })
     }).catch((err) => {
-        res.send(err)
+        res.json({ error: err })
     })
 })
 
 //UPDATE agency by id
-route.patch('/agencies/:id', verifyToken, (req, res, next) => {
-    agenciesModel.updateAgency(req.params.id, req.body.name, req.body.location).then((doc) => {
-        res.send(doc)
+route.patch('/agencies/:agency_id', (req, res, next) => {
+    console.log(req.params)
+    agenciesModel.updateAgency(req.params.agency_id, req.body.agency_name, req.body.agency_location).then((doc) => {
+        res.json({ msg: doc })
     }).catch((err) => {
-        res.send(err)
+        res.json({ msg: err })
     })
 })
 
