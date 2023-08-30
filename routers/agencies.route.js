@@ -19,7 +19,7 @@ verifyToken = async (req, res, next) => {
 }
 
 // add agency
-route.post('/agencies', (req, res, next) => {
+route.post('/agencies', verifyToken, (req, res, next) => {
     agenciesModel.addAgency(req.body.agency_name, req.body.agency_location).then((msg) => {
         res.json({ msg: msg })
     }).catch((err) => {
@@ -28,7 +28,7 @@ route.post('/agencies', (req, res, next) => {
 })
 
 // get all agencies
-route.get('/agencies', (req, res, next) => {
+route.get('/agencies', verifyToken, (req, res, next) => {
     agenciesModel.getAllagencies().then((doc) => {
         res.json(doc)
     }).catch((err) => {
@@ -37,7 +37,7 @@ route.get('/agencies', (req, res, next) => {
 })
 
 //get agency by id
-route.get('/agencies/:id', (req, res, next) => {
+route.get('/agencies/:id', verifyToken, (req, res, next) => {
     agenciesModel.getAgencyById(req.params.id).then((doc) => {
         res.json(doc)
     }).catch((err) => {
@@ -46,7 +46,7 @@ route.get('/agencies/:id', (req, res, next) => {
 })
 
 //DELETE agency by id
-route.delete('/agencies/:id', (req, res, next) => {
+route.delete('/agencies/:id', verifyToken, (req, res, next) => {
     agenciesModel.deleteOneAgency(req.params.id).then((doc) => {
         res.json({ msg: doc })
     }).catch((err) => {
@@ -55,7 +55,7 @@ route.delete('/agencies/:id', (req, res, next) => {
 })
 
 //UPDATE agency by id
-route.patch('/agencies/:agency_id', (req, res, next) => {
+route.patch('/agencies/:agency_id', verifyToken, (req, res, next) => {
     console.log(req.params)
     agenciesModel.updateAgency(req.params.agency_id, req.body.agency_name, req.body.agency_location).then((doc) => {
         res.json({ msg: doc })

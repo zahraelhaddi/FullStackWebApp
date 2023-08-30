@@ -25,7 +25,7 @@ exports.register = (fullname, email, agency, password) => {
         const emailExistsQuery=`SELECT *FROM users WHERE email=$1;`;
         const emailExistsResult= client.query(emailExistsQuery,[email]);
         if((await emailExistsResult).rows.length>0){
-            reject("Already registered")
+            reject("Agent existe déjà!")
         }else{
             let hashedPassword = await bcrypt.hash(password, 10)
             const query = `
@@ -38,7 +38,7 @@ exports.register = (fullname, email, agency, password) => {
                 if (err) {
                     reject("Not inserted")
                 } else {
-                   resolve(result.rows[0])
+                   resolve("nouveau Agent ajoutée avec succès!")
             }
         })
         }
@@ -48,31 +48,63 @@ exports.register = (fullname, email, agency, password) => {
 
 const secretKey = process.env.SECRET_KEY
 
-exports.login=(email,password)=>{
-    return new Promise((resolve,reject)=>{
-        const emailExistsQuery=`SELECT *FROM users WHERE email=$1;`;
-        client.query(emailExistsQuery,[email]).then((result)=>{
-            if(result.rows.length===0){
-                reject("Not Registered")
-            }else{
-                let foundPasssword = result.rows[0].password_hash
-                bcrypt.compare(password, foundPasssword).then((same)=>{
-                if(same==true){
-                    let token = jwt.sign({ user_id: result.rows[0].user_id, username: result.rows[0].fullname }, secretKey)
-                    resolve(token)
-                }else{
-                    reject('password incorrect')
-                }
-            }).catch((err)=>{
-                reject(err)
-            })
-            }
-        }).catch((err)=>{
-            reject(err)
-        })
+// exports.login=(email,password)=>{
+//     return new Promise((resolve,reject)=>{
+//         const emailExistsQuery=`SELECT *FROM users WHERE email=$1;`;
+//         client.query(emailExistsQuery,[email]).then((result)=>{
+//             if(result.rows.length===0){
+//                 reject("Email ou password invalide")
+//             }else{
+//                 let foundPasssword = result.rows[0].password_hash
+//                 bcrypt.compare(password, foundPasssword).then((same)=>{
+//                 if(same==true){
+//                     let token = jwt.sign({ user_id: result.rows[0].user_id, username: result.rows[0].fullname,role:'Admin' }, secretKey,{expiresIn:'1d'})
+//                     resolve({token:token,username:result.rows[0].fullname,role:'admin'})
+//                 }else{
+//                     reject('Email ou password invalide')
+//                 }
+//             }).catch((err)=>{
+//                 reject(err)
+//             })
+//             }
+//         }).catch((err)=>{
+//             reject(err)
+//         })
        
-    })
-}
+//     })
+// }
+exports.login = (email, password) => {
+    return new Promise((resolve, reject) => {
+        const emailExistsQuery = `SELECT * FROM users WHERE email = $1;`;
+        client.query(emailExistsQuery, [email]).then((result) => {
+            if (result.rows.length === 0) {
+                reject("Email ou password invalide");
+            } else {
+                let foundPassword = result.rows[0].password_hash;
+                bcrypt.compare(password, foundPassword).then((same) => {
+                    if (same == true) {
+                        let token = jwt.sign(
+                            {
+                                user_id: result.rows[0].user_id,
+                                username: result.rows[0].fullname,
+                                role: 'Admin'
+                            },
+                            secretKey,
+                            { expiresIn: '100d' }
+                        );
+                        resolve({ token: token, username: result.rows[0].fullname, role: 'admin' });
+                    } else {
+                        reject('Email ou password invalide');
+                    }
+                }).catch((err) => {
+                    reject(err);
+                });
+            }
+        }).catch((err) => {
+            reject(err);
+        });
+    });
+};
 
 exports.getAllUsers=()=>{
     return new Promise((resolve,reject)=>{
@@ -113,23 +145,16 @@ exports.deleteOneUser=(id)=>{
         })
 }
 
-exports.updateUser=(id,fn,email,agency,password)=>{
+exports.updateUser=(id,fn,email)=>{
     return new Promise((resolve, reject) => {
-        const verifquery = `select * from users where user_id=$1;`
-        client.query(verifquery, [id]).then(async(resu) => {
-            if (resu.rows.length > 0) {
-                resolve(resu.rows)
-                const query = `update users set fullname=$1,email=$2, agency_id=$3,password_hash=$4 where user_id=$5;`
-                const  hashedpass= await bcrypt.hash(password,10)
-                client.query(query, [fn,email,agency, hashedpass,id]).then((result) => {
-                    resolve('updated')
+                const query = `update users set fullname=$1,email=$2 where user_id=$3;`
+                client.query(query, [fn,email,id]).then((result) => {
+                    resolve('Mise à jour effectué avec succès!')
                 }).catch((err) => {
                     reject(err)
                 })
-            } else {
-                reject('no user with the specified id')
-            }
-        })
+            
+        
 
     })
 }

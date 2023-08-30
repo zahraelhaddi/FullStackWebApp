@@ -21,16 +21,16 @@ verifyToken = async (req, res, next) => {
 }
 
 // get all cars endpoints
-route.get('/cars', (req, res, next) => {
+route.get('/cars', verifyToken, (req, res, next) => {
     carsModel.getAllcars().then((doc) => {
-        res.send(doc)
+        res.json(doc)
     }).catch((err) => {
         res.json({ error: err })
     })
 })
 
 // add car endpoint
-route.post('/cars', (req, res, next) => {
+route.post('/cars', verifyToken, (req, res, next) => {
     const tax = AnnualTaxCalculator.AnnualTaxCalculator(req.body.puissance, req.body.carburant_id)
     carsModel.addCar(req.body.agency_id, req.body.model, tax, true, req.body.matricule, req.body.ville, req.body.marque, req.body.color, req.body.categorie, req.body.carburant_id, req.body.date_immatri, req.body.puissance).then((msg) => {
         res.json({ msg: msg })
@@ -41,7 +41,7 @@ route.post('/cars', (req, res, next) => {
 
 
 //get car by id endpoint
-route.get('/cars/:id', (req, res, next) => {
+route.get('/cars/:id', verifyToken, (req, res, next) => {
     carsModel.getcarById(req.params.id).then((doc) => {
         res.json(doc[0])
     }).catch((err) => {
@@ -50,7 +50,7 @@ route.get('/cars/:id', (req, res, next) => {
 })
 
 //delete car by id endpoint
-route.delete('/cars/:id', (req, res, next) => {
+route.delete('/cars/:id', verifyToken, (req, res, next) => {
     carsModel.deleteOneCar(req.params.id).then((doc) => {
         res.json({ msg: doc })
     }).catch((err) => {
@@ -59,7 +59,7 @@ route.delete('/cars/:id', (req, res, next) => {
 })
 
 //update car by id endpoint
-route.patch('/cars/:id', async (req, res, next) => {
+route.patch('/cars/:id', verifyToken, async (req, res, next) => {
     try {
         const tax = await AnnualTaxCalculator.AnnualTaxCalculator(req.body.puissance, req.body.carburant_id);
         const result = await carsModel.updateCar(req.params.id, req.body.agency_id, req.body.model, tax, true, req.body.matricule, req.body.ville, req.body.marque, req.body.color, req.body.categorie, req.body.carburant_id, req.body.date_immatri, req.body.puissance);
@@ -72,7 +72,7 @@ route.patch('/cars/:id', async (req, res, next) => {
 
 
 //update a car's tax(if null)
-route.patch('/cars/tax/:id', async (req, res, next) => {
+route.patch('/cars/tax/:id', verifyToken, async (req, res, next) => {
     const doc = await carsModel.getCarburantAndPuissance(req.params.id)
     let carburant_id = doc.rows[0].carburant_id
     let puissance = doc.rows[0].puissance
@@ -86,7 +86,7 @@ route.patch('/cars/tax/:id', async (req, res, next) => {
 })
 
 //update a car's avalability_status
-route.patch('/cars/availability/:id', (req, res, next) => {
+route.patch('/cars/availability/:id', verifyToken, (req, res, next) => {
 
     carsModel.changeAvailability(req.params.id, req.body.availability)
         .then((doc) => {

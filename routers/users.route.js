@@ -7,64 +7,101 @@ const dotenv = require("dotenv").config()
 
 const secretKey = process.env.SECRET_KEY
 verifyToken = async (req, res, next) => {
-    let token = req.headers.token
+    let token = req.headers.token;
     if (!token) {
-        res.status(404).send("access denied!")
+        return res.status(401).json("Access denied!"); // 401 Unauthorized
     }
+
     try {
-        let verif = await jwt.verify(token, secretKey)  //jwt.verify katakhd token dyalna okatchof wach howa fl7a9i9a kayn 
-        next()
+        let verif = await jwt.verify(token, secretKey);
+        next(); // Proceed to the next middleware or route handler
     } catch (err) {
-        res.status(404).send(err)
+        res.status(403).json(err); // 403 Forbidden
     }
-}
+};
+
+const specificAdminUsername = process.env.USERNAME_ADMIN;
+
+// verifyTokenAdmin = (req, res, next) => {
+//     let token = req.headers.token;
+//     if (!token) {
+//         return res.status(401).json("Access denied!"); // 401 Unauthorized
+//     }
+
+//     if (token === specificAdminToken) {
+//         next(); // Proceed to the next middleware or route handler
+//     } else {
+//         res.status(403).json("Unauthorized"); // 403 Forbidden
+//     }
+// };
+verifyTokenAdmin = (req, res, next) => {
+    let token = req.headers.token;
+    if (!token) {
+        return res.status(401).json("Access denied!"); // 401 Unauthorized
+    }
+
+    try {
+        let decodedToken = jwt.verify(token, secretKey);
+        if (decodedToken.username === specificAdminUsername) {
+            next(); // Proceed to the next middleware or route handler
+        } else {
+            res.status(403).json("Unauthorized"); // 403 Forbidden
+        }
+    } catch (err) {
+        res.status(403).json(err); // 403 Forbidden
+    }
+};
 
 
-route.post('/register', (req, res, next) => {
+
+route.post('/users/add', verifyTokenAdmin, (req, res, next) => {
     usersModel.register(req.body.fullname, req.body.email, req.body.agency, req.body.password).then((msg) => {
-        res.send(msg)
+        res.json(msg)
     }).catch((err) => {
-        res.send(err)
+        res.json(err)
     })
 })
 
-route.post('/login', (req, res, next) => {
+route.post('/admin/login', (req, res, next) => {
     usersModel.login(req.body.email, req.body.password).then((doc) => {
-        res.send(doc)
+        res.json(doc)
     }).catch((err) => {
-        res.send(err)
+        res.json(err)
     })
 })
 
-route.get('/users', (req, res, next) => {
+route.get('/users', verifyToken, (req, res, next) => {
     usersModel.getAllUsers().then((users) => {
-        res.send(users)
+        res.json(users)
     }).catch((err) => {
-        res.send(err)
+        res.status(500).json(err)
     })
 })
+
+
+
 
 route.get('/users/:id', verifyToken, (req, res, next) => {
     usersModel.getOneUser(req.params.id).then((doc) => {
-        res.send(doc.rows)
+        res.json(doc.rows[0])
     }).catch((err) => {
-        res.send(err)
+        res.json(err)
     })
 })
 
 route.delete('/users/:id', verifyToken, (req, res, next) => {
     usersModel.deleteOneUser(req.params.id).then((doc) => {
-        res.send(doc)
+        res.json(doc)
     }).catch((err) => {
-        res.send(err)
+        res.json(err)
     })
 })
 
-route.patch('/users/:id', verifyToken, (req, res, next) => {
-    usersModel.updateUser(req.params.id, req.body.fullname, req.body.email, req.body.agency, req.body.password).then((doc) => {
-        res.send(doc)
+route.patch('/users/:user_id', verifyToken, (req, res, next) => {
+    usersModel.updateUser(req.params.user_id, req.body.fullname, req.body.email).then((doc) => {
+        res.json({ msg: doc })
     }).catch((err) => {
-        res.send(err)
+        res.json(err)
     })
 })
 
