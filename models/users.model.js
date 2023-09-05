@@ -22,7 +22,7 @@ client.connect()
 exports.register = (fullname, email, agency, password) => {
     return new Promise(async (resolve, reject) => {
 
-        const emailExistsQuery=`SELECT *FROM users WHERE email=$1;`;
+        const emailExistsQuery=`SELECT user_id,fullname,email,agency_id,password_hash FROM users WHERE email=$1;`;
         const emailExistsResult= client.query(emailExistsQuery,[email]);
         if((await emailExistsResult).rows.length>0){
             reject("Agent existe déjà!")
@@ -73,6 +73,8 @@ const secretKey = process.env.SECRET_KEY
        
 //     })
 // }
+
+
 exports.login = (email, password) => {
     return new Promise((resolve, reject) => {
         const emailExistsQuery = `SELECT * FROM users WHERE email = $1;`;
@@ -83,16 +85,26 @@ exports.login = (email, password) => {
                 let foundPassword = result.rows[0].password_hash;
                 bcrypt.compare(password, foundPassword).then((same) => {
                     if (same == true) {
+                        // let token = jwt.sign(
+                        //     {
+                        //         user_id: result.rows[0].user_id,
+                        //         username: result.rows[0].fullname,
+                        //         role: 'Admin'
+                        //     },
+                        //     secretKey,
+                        //     { expiresIn: '100d' }
+                        // );
+                        let role = result.rows[0].role; // Get the user's role from the database
                         let token = jwt.sign(
                             {
                                 user_id: result.rows[0].user_id,
                                 username: result.rows[0].fullname,
-                                role: 'Admin'
+                                role: role // Include the user's role in the token
                             },
                             secretKey,
                             { expiresIn: '100d' }
                         );
-                        resolve({ token: token, username: result.rows[0].fullname, role: 'admin' });
+                        resolve({ token: token, username: result.rows[0].fullname, role: role });
                     } else {
                         reject('Email ou password invalide');
                     }
@@ -159,6 +171,18 @@ exports.updateUser=(id,fn,email)=>{
     })
 }
 
+exports.getagencyidfromuserid = (id) => {
+    return new Promise((resolve, reject) => {
+        const query = `select agency_id from users where user_id=$1;`
+        client.query(query, [id])
+            .then((result) => {
+                resolve(result)
+            })
+            .catch((err) => {
+                reject(err);
+            });
+    });
+}
 // exports.getUserById=(id)=>{
 //     return new Promise((resolve,reject)=>{
 //         const getUserbyIdQuery= `SELECT * from users where id=$1;`

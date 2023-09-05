@@ -17,6 +17,20 @@ const client = new Client({
 
 client.connect()
 
+exports.getcarsByAgency = (id) => {
+    return new Promise((resolve, reject) => {
+        const query = `select * from cars where agency_id=$1 LIMIT 7;`
+        client.query(query, [id]).then((result) => {
+
+            resolve(result)
+        }).catch((err) => {
+            reject(err)
+        })
+    })
+}
+
+
+
 exports.getAllcars = () => {
     return new Promise((resolve, reject) => {
         const query = `SELECT
@@ -260,5 +274,37 @@ exports.changeAvailability = (id, availability) => {
             reject('No car with the specified id!')
         }
 
+    })
+}
+
+
+
+exports.availablecarsnb = (id) => {
+    return new Promise((resolve, reject) => {
+        client.query(`SELECT COUNT(*) FROM cars WHERE availability_status='true' AND agency_id=$1;`, [id]).then((doc) => {
+            resolve(doc.rows[0].count)
+        }).catch((err) => {
+            reject(err)
+        })
+    })
+}
+
+exports.unavailablecarsnb = (id) => {
+    return new Promise((resolve, reject) => {
+        client.query(`SELECT COUNT(*) FROM cars WHERE availability_status='false' AND agency_id=$1;`, [id]).then((doc) => {
+            resolve(doc.rows[0].count)
+        }).catch((err) => {
+            reject(err)
+        })
+    })
+}
+
+exports.totalCarsByAgency = (id) => {
+    return new Promise((resolve, reject) => {
+        client.query(`SELECT COUNT(*) FROM cars WHERE agency_id=$1;`, [id]).then((doc) => {
+            resolve(doc)
+        }).catch((err) => {
+            reject(err)
+        })
     })
 }

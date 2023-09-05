@@ -95,3 +95,16 @@ exports.updateAgency = (id, name, loc) => {
 
 }
 
+exports.nbrAgencies = () => {
+    return new Promise((resolve, reject) => {
+        const query = `select count(*) from agencies;`
+        client.query(query).then((result) => {
+            resolve(result)
+        }).catch((err) => {
+            reject(err)
+        })
+
+    })
+}
+
+

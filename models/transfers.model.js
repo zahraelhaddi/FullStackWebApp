@@ -128,7 +128,35 @@ exports.updateTransfer = (id, car_id, source, destination,) => {
 
 exports.getUserTransfers = (id) => {
     return new Promise((resolve, reject) => {
-        const query = `select *from transfers where user_id=$1; `
+        const query = `SELECT
+        t.transfer_id,
+        JSON_BUILD_OBJECT(
+            'user_id', u.user_id,
+            'fullname', u.fullname,
+            'email', u.email
+        ) AS user_info,
+        JSON_BUILD_OBJECT(
+            'agency_id', src_agency.agency_id,
+            'agency_name', src_agency.agency_name,
+            'agency_location', src_agency.agency_location
+        ) AS source_agency,
+        JSON_BUILD_OBJECT(
+            'agency_id', dest_agency.agency_id,
+            'agency_name', dest_agency.agency_name,
+            'agency_location', dest_agency.agency_location
+        ) AS destination_agency,
+        JSON_BUILD_OBJECT(
+            'car_id', c.car_id,
+            'model', c.model,
+            'annual_tax', c.annual_tax
+        ) AS car,
+        t.transfer_date
+    FROM transfers t
+    JOIN agencies src_agency ON t.source_agency_id = src_agency.agency_id
+    JOIN agencies dest_agency ON t.destination_agency_id = dest_agency.agency_id
+    JOIN cars c ON t.car_id = c.car_id
+    JOIN users u ON t.user_id = u.user_id where t.user_id=$1;`
+        // const query = `select *from transfers where user_id=$1; `
         client.query(query, [id]).then((doc) => {
             resolve(doc.rows)
         }).catch((err) => {
