@@ -20,20 +20,25 @@ verifyToken = async (req, res, next) => {
     }
 };
 
-const specificAdminUsername = process.env.USERNAME_ADMIN;
-
+//const specificAdminUsername = process.env.USERNAME_ADMIN;
 // verifyTokenAdmin = (req, res, next) => {
 //     let token = req.headers.token;
 //     if (!token) {
 //         return res.status(401).json("Access denied!"); // 401 Unauthorized
 //     }
 
-//     if (token === specificAdminToken) {
-//         next(); // Proceed to the next middleware or route handler
-//     } else {
-//         res.status(403).json("Unauthorized"); // 403 Forbidden
+//     try {
+//         let decodedToken = jwt.verify(token, secretKey);
+//         if (decodedToken.username === specificAdminUsername) {
+//             next(); // Proceed to the next middleware or route handler
+//         } else {
+//             res.status(403).json("Unauthorized"); // 403 Forbidden
+//         }
+//     } catch (err) {
+//         res.status(403).json(err); // 403 Forbidden
 //     }
 // };
+
 verifyTokenAdmin = (req, res, next) => {
     let token = req.headers.token;
     if (!token) {
@@ -42,7 +47,7 @@ verifyTokenAdmin = (req, res, next) => {
 
     try {
         let decodedToken = jwt.verify(token, secretKey);
-        if (decodedToken.username === specificAdminUsername) {
+        if (decodedToken.role === process.env.ROLE) {
             next(); // Proceed to the next middleware or route handler
         } else {
             res.status(403).json("Unauthorized"); // 403 Forbidden
@@ -51,6 +56,7 @@ verifyTokenAdmin = (req, res, next) => {
         res.status(403).json(err); // 403 Forbidden
     }
 };
+
 
 
 
@@ -104,6 +110,16 @@ route.patch('/users/:user_id', verifyToken, (req, res, next) => {
         res.json(err)
     })
 })
+
+route.get('/c/:id', (req, res, next) => {
+    usersModel.getagencyidfromuserid(req.params.id).then((doc) => {
+        res.json(doc.rows[0].agency_id)
+    }).catch((err) => {
+        res.json(err)
+    })
+})
+
+
 
 
 

@@ -144,7 +144,7 @@ route.patch('/transfers/:id', (req, res, next) => {
 
 route.get('/transfers/user/:id', verifyToken, (req, res, next) => {
     transfersModel.getUserTransfers(req.params.id).then((result) => {
-        // res.json({ userTransfers: result })
+        //res.json({ userTransfers: result })
         res.json(result)
     }).catch((err) => {
         res.json(err)

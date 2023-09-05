@@ -56,11 +56,19 @@ route.delete('/agencies/:id', verifyToken, (req, res, next) => {
 
 //UPDATE agency by id
 route.patch('/agencies/:agency_id', verifyToken, (req, res, next) => {
-    console.log(req.params)
+    //console.log(req.params)
     agenciesModel.updateAgency(req.params.agency_id, req.body.agency_name, req.body.agency_location).then((doc) => {
         res.json({ msg: doc })
     }).catch((err) => {
         res.json({ msg: err })
+    })
+})
+
+route.get("/agenciesnbre", (req, res, next) => {
+    agenciesModel.nbrAgencies().then((doc) => {
+        res.json(doc.rows[0].count)
+    }).catch((err) => {
+        res.json(err)
     })
 })
 
