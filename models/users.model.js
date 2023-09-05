@@ -19,7 +19,7 @@ const client = new Client({
 client.connect()
 
 
-exports.register = (fullname, email, agency, password) => {
+exports.register = (fullname, email, agency, password,role) => {
     return new Promise(async (resolve, reject) => {
 
         const emailExistsQuery=`SELECT user_id,fullname,email,agency_id,password_hash FROM users WHERE email=$1;`;
@@ -29,12 +29,12 @@ exports.register = (fullname, email, agency, password) => {
         }else{
             let hashedPassword = await bcrypt.hash(password, 10)
             const query = `
-            INSERT INTO users (fullname, email, agency_id, password_hash)
-            VALUES ($1, $2, $3, $4)
+            INSERT INTO users (fullname, email, agency_id, password_hash,role)
+            VALUES ($1, $2, $3, $4, $5)
             RETURNING *;
         `;
 
-            client.query(query, [fullname, email, agency, hashedPassword], (err, result) => {
+            client.query(query, [fullname, email, agency, hashedPassword,role], (err, result) => {
                 if (err) {
                     reject("Not inserted")
                 } else {

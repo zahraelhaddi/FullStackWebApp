@@ -61,7 +61,8 @@ verifyTokenAdmin = (req, res, next) => {
 
 
 route.post('/users/add', verifyTokenAdmin, (req, res, next) => {
-    usersModel.register(req.body.fullname, req.body.email, req.body.agency, req.body.password).then((msg) => {
+    const defaultrole = 'User';
+    usersModel.register(req.body.fullname, req.body.email, req.body.agency, req.body.password, defaultrole).then((msg) => {
         res.json(msg)
     }).catch((err) => {
         res.json(err)

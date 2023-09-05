@@ -23,7 +23,7 @@ route.post('/agencies', verifyToken, (req, res, next) => {
     agenciesModel.addAgency(req.body.agency_name, req.body.agency_location).then((msg) => {
         res.json({ msg: msg })
     }).catch((err) => {
-        res.json({ error: err })
+        res.json({ msg: err })
     })
 })
 

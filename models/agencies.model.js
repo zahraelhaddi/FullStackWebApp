@@ -34,11 +34,11 @@ exports.addAgency = (name, location) => {
         const verifQuery = `SELECT * FROM agencies WHERE agency_name=$1 OR agency_location=$2;`;
         client.query(verifQuery, [name, location]).then((result) => {
             if (result.rows.length > 0) {
-                reject("Agency already exists")
+                reject("Agence existe déjà!")
             } else {
                 const query = `INSERT INTO agencies(agency_name,agency_location) VALUES($1,$2);`;
                 client.query(query, [name, location]).then((msg) => {
-                    resolve('Agency successfully added!')
+                    resolve('Agence ajoutée avec Succès!')
                 }).catch((err) => {
                     reject(err)
                 })
