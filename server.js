@@ -23,17 +23,8 @@ app.use(transfersRouter)
 
 
 
-//after deployment the cors polivi "*" becomes the new url of the site with the domain name
-
-
-
-//const bcrypt = require('bcrypt')
-// app.post('/', async (req, res, next) => {
-//     const hashedpassword = await bcrypt.hash(req.body.password, 10)
-//     res.send(hashedpassword)
-// })
-
-
 app.listen('4000', () => {
     console.log('Listening on port 4000')
 })
+
+//after deployment the cors polivi "*" becomes the new url of the site with the domain name

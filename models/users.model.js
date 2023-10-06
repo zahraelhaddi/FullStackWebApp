@@ -48,33 +48,6 @@ exports.register = (fullname, email, agency, password,role) => {
 
 const secretKey = process.env.SECRET_KEY
 
-// exports.login=(email,password)=>{
-//     return new Promise((resolve,reject)=>{
-//         const emailExistsQuery=`SELECT *FROM users WHERE email=$1;`;
-//         client.query(emailExistsQuery,[email]).then((result)=>{
-//             if(result.rows.length===0){
-//                 reject("Email ou password invalide")
-//             }else{
-//                 let foundPasssword = result.rows[0].password_hash
-//                 bcrypt.compare(password, foundPasssword).then((same)=>{
-//                 if(same==true){
-//                     let token = jwt.sign({ user_id: result.rows[0].user_id, username: result.rows[0].fullname,role:'Admin' }, secretKey,{expiresIn:'1d'})
-//                     resolve({token:token,username:result.rows[0].fullname,role:'admin'})
-//                 }else{
-//                     reject('Email ou password invalide')
-//                 }
-//             }).catch((err)=>{
-//                 reject(err)
-//             })
-//             }
-//         }).catch((err)=>{
-//             reject(err)
-//         })
-       
-//     })
-// }
-
-
 exports.login = (email, password) => {
     return new Promise((resolve, reject) => {
         const emailExistsQuery = `SELECT * FROM users WHERE email = $1;`;
@@ -85,15 +58,7 @@ exports.login = (email, password) => {
                 let foundPassword = result.rows[0].password_hash;
                 bcrypt.compare(password, foundPassword).then((same) => {
                     if (same == true) {
-                        // let token = jwt.sign(
-                        //     {
-                        //         user_id: result.rows[0].user_id,
-                        //         username: result.rows[0].fullname,
-                        //         role: 'Admin'
-                        //     },
-                        //     secretKey,
-                        //     { expiresIn: '100d' }
-                        // );
+                        
                         let role = result.rows[0].role; // Get the user's role from the database
                         let token = jwt.sign(
                             {
@@ -206,3 +171,30 @@ exports.getagencyidfromuserid = (id) => {
         
 //     })
 // }
+// exports.login=(email,password)=>{
+//     return new Promise((resolve,reject)=>{
+//         const emailExistsQuery=`SELECT *FROM users WHERE email=$1;`;
+//         client.query(emailExistsQuery,[email]).then((result)=>{
+//             if(result.rows.length===0){
+//                 reject("Email ou password invalide")
+//             }else{
+//                 let foundPasssword = result.rows[0].password_hash
+//                 bcrypt.compare(password, foundPasssword).then((same)=>{
+//                 if(same==true){
+//                     let token = jwt.sign({ user_id: result.rows[0].user_id, username: result.rows[0].fullname,role:'Admin' }, secretKey,{expiresIn:'1d'})
+//                     resolve({token:token,username:result.rows[0].fullname,role:'admin'})
+//                 }else{
+//                     reject('Email ou password invalide')
+//                 }
+//             }).catch((err)=>{
+//                 reject(err)
+//             })
+//             }
+//         }).catch((err)=>{
+//             reject(err)
+//         })
+       
+//     })
+// }
+
+
